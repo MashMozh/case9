@@ -3,34 +3,44 @@ import math
 import time
 import webcolors
 
+# ======== Меню выбора цвета с эмодзи ========
+available_colors_1 = [
+    ('\U0001F48B Красный', 'red'),
+    ('\U0001F499 Синий', 'blue'),
+    ('\U0001F49A Зелёный', 'green'),
+    ('\U0001F49B Жёлтый', 'yellow'),
+    ('\U0001F49C Фиолетовый', 'purple'),
+    ('\U0001F4A6 Голубой', 'cyan')
+]
 
-print('===Гексагональный арт-генератор ===\n')
+available_colors_2 = [
+    ('\U0001F5A4 Чёрный', 'black'),
+    ('\U0001F47D Серый', 'gray'),
+    ('\U0001F495 Розовый', 'pink'),
+    ('\U0001F9E1 Оранжевый', 'orange'),
+    ('\U0001F90E Коричневый', 'brown'),
+    ('\U0001F916 Свой цвет (HEX/английское имя)', None)
+]
 
+# ======== Цвета для границы ========
+color_map = {
+    'красный':'red','оранжевый':'orange','желтый':'yellow','зеленый':'green',
+    'синий':'blue','фиолетовый':'purple','розовый':'pink','черный':'black',
+    'серый':'gray','белый':'white','коричневый':'brown'
+}
 
-# === Ввод количества гексагонов ===
-def get_num_hexagons() -> int:
-    """Функция для ввода количества шестиугольников с валидацией"""
+def translate_color(color_rus):
+    return color_map.get(color_rus.lower(), 'black')
+
+# ======== Ввод собственного цвета ========
+def get_valid_color_from_user(prompt: str) -> str:
     while True:
-        try:
-            quantity = int(input('Введите количество шестиугольников в ряду (от 4 до 20): '))
-            if 4 <= quantity <= 20:
-                return quantity
-            else:
-                print('Число должно быть от 4 до 20.')
-        except ValueError:
-            print('Введите корректное число.')
-
-
-# === Проверка и ввод пользовательского цвета ===
-def get_valid_color_from_user() -> str:
-    """Позволяет ввести свой цвет (HEX или английское имя)"""
-    while True:
-        user_input = input("Введите свой цвет (HEX или английское название): ").strip().lower()
+        user_input = input(prompt).strip().lower()
         if user_input.startswith('#'):
             if len(user_input) in (4, 7):
                 return user_input
             else:
-                print("Ошибка: неправильный формат HEX. Пример: #ff0000 или #f00")
+                print("Ошибка: неправильный формат HEX. Пример #ff0000 или #f00")
         else:
             try:
                 webcolors.name_to_hex(user_input)
@@ -38,62 +48,92 @@ def get_valid_color_from_user() -> str:
             except ValueError:
                 print("Ошибка: неизвестное название цвета. Попробуйте снова.")
 
-
-# === Меню выбора цветов ===
+# ======== Выбор двух цветов ========
 def get_color_choice():
-    """Позволяет выбрать два цвета — из меню или ввести свои"""
-    print('Доступные цвета:\n')
-
-    available_colors_1 = [
-        ('\U0001F48B Красный', 'red'),
-        ('\U0001F499 Синий', 'blue'),
-        ('\U0001F49A Зелёный', 'green'),
-        ('\U0001F49B Жёлтый', 'yellow'),
-        ('\U0001F49C Фиолетовый', 'purple'),
-        ('\U0001F4A6 Голубой', 'cyan')
-    ]
-
-    available_colors_2 = [
-        ('\U0001F5A4 Чёрный', 'black'),
-        ('\U0001F47D Серый', 'gray'),
-        ('\U0001F495 Розовый', 'pink'),
-        ('\U0001F9E1 Оранжевый', 'orange'),
-        ('\U0001F90E Коричневый', 'brown'),
-        ('\U0001F916 Свой цвет (HEX/английское имя)', None)
-    ]
-
+    print("Доступные цвета:\n")
     max_width = max(len(c[0]) for c in available_colors_1) + 3
-
-    for i, (col1, col2) in enumerate(zip(available_colors_1, available_colors_2), start=1):
+    for i, (c1, c2) in enumerate(zip(available_colors_1, available_colors_2), start=1):
         left_num = i
         right_num = i + len(available_colors_1)
-        print(f"{left_num:>2}. {col1[0]:<{max_width}} {right_num:>2}. {col2[0]}")
+        print(f"{left_num:>2}. {c1[0]:<{max_width}} {right_num:>2}. {c2[0]}")
 
-    def choose_color(num_prompt: str) -> str:
+    def choose_color(prompt: str) -> str:
         while True:
             try:
-                num = int(input(num_prompt))
+                num = int(input(prompt))
                 if 1 <= num <= 12:
                     if num <= 6:
-                        return available_colors_1[num - 1][1]
+                        return available_colors_1[num-1][1]
                     elif num < 12:
-                        return available_colors_2[num - 7][1]
+                        return available_colors_2[num-7][1]
                     else:
-                        return get_valid_color_from_user()
+                        return get_valid_color_from_user("Введите цвет (HEX или английское имя): ")
                 else:
-                    print("Номер должен быть от 1 до 12.")
+                    print("Номер должен быть от 1 до 12")
             except ValueError:
-                print("Введите число от 1 до 12.")
+                print("Введите число от 1 до 12")
 
-    first_color = choose_color("\nВведите номер первого цвета (1–12): ")
-    second_color = choose_color("Введите номер второго цвета (1–12): ")
+    first = choose_color("Введите номер первого цвета (1–12): ")
+    second = choose_color("Введите номер второго цвета (1–12): ")
+    return first, second
 
-    return first_color, second_color
+# ======== Настройки границы и тени ========
+def border_thickness():
+    options = {'тонкий':1, 'средний':3, 'толстый':5}
+    print("Толщина границы: тонкий, средний, толстый")
+    while True:
+        choice = input("Выберите толщину границы: ").strip().lower()
+        if choice in options: return options[choice]
+        print("Ошибка ввода")
+
+def border_color():
+    options = ['красный','оранжевый','желтый','зеленый','синий','фиолетовый',
+               'розовый','черный','серый','белый']
+    print("Цвет границы: " + ", ".join(options))
+    while True:
+        choice = input("Выберите цвет границы: ").strip().lower()
+        if choice in options: return translate_color(choice)
+        print("Ошибка ввода")
+
+def shadow_brightness():
+    options = {'нет':0, 'слабый':5, 'средний':8, 'сильный':12}
+    print("Интенсивность тени: нет, слабый, средний, сильный")
+    while True:
+        choice = input("Выберите интенсивность тени: ").strip().lower()
+        if choice in options: return options[choice]
+        print("Ошибка ввода")
+
+# ======== Количество шестиугольников ========
+def get_num_hexagons():
+    while True:
+        val = input("Введите количество шестиугольников в ряду (4-20): ").strip()
+        if val.isdigit() and 4 <= int(val) <= 20:
+            return int(val)
+        print("Ошибка: введите число от 4 до 20.")
 
 
-# === Предпросмотр выбранных цветов ===
-def preview_colors(color1: str, color2: str):
-    """Показывает предпросмотр выбранных цветов"""
+# ======== Вычисление координат ========
+def calculate_side_length(number, size):
+    return size/(number+0.5)
+
+def calculate_hexagon_centers(number, size):
+    side = calculate_side_length(number, size)
+    width_hex = math.sqrt(3) * side
+    total_width = width_hex * number
+    total_height = side * 1.5 * number
+    start_x = -total_width / 2 + width_hex / 2
+    start_y = total_height / 2 - side / 2
+    centers = []
+    for row in range(number):
+        y = start_y - row * side * 1.5
+        for col in range(number):
+            x = start_x + col * width_hex
+            if row % 2 == 1: x += width_hex / 2
+            centers.append((x, y))
+    return centers, side
+
+# ======== Предпросмотр выбранных цветов ========
+def preview_colors(color1, color2):
     turtle.clearscreen()
     turtle.hideturtle()
     turtle.speed(0)
@@ -106,42 +146,40 @@ def preview_colors(color1: str, color2: str):
         turtle.fillcolor(color)
         turtle.begin_fill()
         for _ in range(4):
-            turtle.forward(120)
+            turtle.forward(100)
             turtle.right(90)
         turtle.end_fill()
         turtle.penup()
-        turtle.goto(x + 60, y - 30)
+        turtle.goto(x + 50, y - 30)
         turtle.color("black")
         turtle.write(label, align="center", font=("Arial", 14, "normal"))
 
-    draw_square(-160, 50, color1, f"Цвет 1: {color1}")
-    draw_square(80, 50, color2, f"Цвет 2: {color2}")
-
+    draw_square(-150, 50, color1, f"Цвет 1: {color1}")
+    draw_square(50, 50, color2, f"Цвет 2: {color2}")
     turtle.penup()
-    turtle.goto(0, -120)
-    turtle.color("black")
+    turtle.goto(0, -100)
     turtle.write("Нажмите Enter в консоли, чтобы начать рисование",
                  align="center", font=("Arial", 14, "italic"))
-
     input("\nНажмите Enter, чтобы начать рисование...")
 
-
-# === Рисование гексагона с тенями и границами ===
-def draw_hexagon(x: float, y: float, side_len: float, color: str):
-    """Рисует гексагон с тенями"""
-    # Тень
+# ======== Рисование шестиугольников ========
+def draw_shadow(x, y, side, shadow_intensity):
+    if shadow_intensity == 0: return
+    shadow_x = x + shadow_intensity
+    shadow_y = y - shadow_intensity
     turtle.penup()
-    turtle.goto(x + 3, y - 3)
+    turtle.goto(shadow_x, shadow_y)
     turtle.pendown()
-    turtle.fillcolor("#a0a0a0")
+    turtle.fillcolor("#686868")
     turtle.begin_fill()
     turtle.setheading(30)
     for _ in range(6):
-        turtle.forward(side_len)
+        turtle.forward(side)
         turtle.right(60)
     turtle.end_fill()
+    turtle.setheading(0)
 
-    # Основная фигура
+def draw_hexagon(x, y, side, color):
     turtle.penup()
     turtle.goto(x, y)
     turtle.pendown()
@@ -149,74 +187,58 @@ def draw_hexagon(x: float, y: float, side_len: float, color: str):
     turtle.begin_fill()
     turtle.setheading(30)
     for _ in range(6):
-        turtle.forward(side_len)
+        turtle.forward(side)
         turtle.right(60)
     turtle.end_fill()
     turtle.setheading(0)
 
-
-def draw_hexagon_border(x: float, y: float, side_len: float):
-    """Граница вокруг гексагона"""
+def draw_hexagon_border(x, y, side, thickness, color):
     turtle.penup()
     turtle.goto(x, y)
     turtle.pendown()
-    turtle.pencolor("black")
-    turtle.pensize(2)
+    turtle.pencolor(color)
+    turtle.pensize(thickness)
     turtle.setheading(30)
     for _ in range(6):
-        turtle.forward(side_len)
+        turtle.forward(side)
         turtle.right(60)
-    turtle.pensize(1)
     turtle.setheading(0)
+    turtle.pensize(1)
 
-
-def animate_drawing(centers: list, colors: list, side: float):
-    """Анимированное рисование узора"""
+def animate_drawing(centers, colors, side, thickness, color_bord, shadow_intensity):
     turtle.tracer(0, 0)
-    for (x, y), color in zip(centers, colors):
+    for i, (x, y) in enumerate(centers):
+        color = colors[i]
+        if shadow_intensity > 0: draw_shadow(x, y, side, shadow_intensity)
         draw_hexagon(x, y, side, color)
-        draw_hexagon_border(x, y, side)
+        draw_hexagon_border(x, y, side, thickness, color_bord)
         turtle.update()
-        time.sleep(0.04)
+        time.sleep(0.05)
     turtle.tracer(1, 10)
 
-
-# === Главная функция ===
+# ======== Главная функция ========
 def main():
-    turtle.setup(900, 900)
+    turtle.setup(800, 800)
     turtle.speed(0)
     turtle.hideturtle()
-    turtle.bgcolor("#f8f8ff")
+    turtle.bgcolor("white")
 
     N = get_num_hexagons()
-    color_first, color_second = get_color_choice()
-
-    preview_colors(color_first, color_second)
-
+    color1, color2 = get_color_choice()
+    preview_colors(color1, color2)
+    thickness = border_thickness()
+    color_bord = border_color()
+    shadow_intensity = shadow_brightness()
     size = 500
-    side_length = size / (N * 1.5)
-    diagonal = math.sqrt(3) * side_length
 
-    start_x_0 = -diagonal * N / 2
-    start_y_0 = side_length * (N / 2)
-
-    centers, colors = [], []
+    centers, side = calculate_hexagon_centers(N, size)
+    colors = []
     for row in range(N):
-        y_offset = start_y_0 - row * side_length * 1.5
-        x_offset = start_x_0 + (diagonal / 2 if row % 2 else 0)
-        color = color_first if row % 2 == 0 else color_second
         for col in range(N):
-            x = x_offset + col * diagonal
-            centers.append((x, y_offset))
-            colors.append(color)
+            colors.append(color1 if row % 2 == 0 else color2)
 
-    animate_drawing(centers, colors, side_length)
-
-    turtle.penup()
-    turtle.goto(0, -size / 2 - 30)
-    turtle.color("black")
+    animate_drawing(centers, colors, side, thickness, color_bord, shadow_intensity)
     turtle.done()
-
 
 if __name__== "__main__":
     main()

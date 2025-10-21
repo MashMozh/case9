@@ -4,35 +4,34 @@ import time
 import webcolors
 
 
-print('=== Гексагональный арт-генератор ===\n')
+print('===Гексагональный арт-генератор ===\n')
 
 
+# === Ввод количества гексагонов ===
 def get_num_hexagons() -> int:
     """Функция для ввода количества шестиугольников с валидацией"""
     while True:
         try:
-            quantity = int(input('Введите количество шестиугольников '
-                                 'в ряду (от 4 до 20): '))
+            quantity = int(input('Введите количество шестиугольников в ряду (от 4 до 20): '))
             if 4 <= quantity <= 20:
                 return quantity
             else:
-                print('Число шестиугольников должно быть в диапазоне от 4 до 20.')
+                print('Число должно быть от 4 до 20.')
         except ValueError:
-            print('Пожалуйста, введите числовое значение от 4 до 20.')
+            print('Введите корректное число.')
 
 
+# === Проверка и ввод пользовательского цвета ===
 def get_valid_color_from_user() -> str:
-    """Позволяет ввести свой цвет в формате HEX или английское имя"""
+    """Позволяет ввести свой цвет (HEX или английское имя)"""
     while True:
         user_input = input("Введите свой цвет (HEX или английское название): ").strip().lower()
-        # Проверяем HEX
         if user_input.startswith('#'):
             if len(user_input) in (4, 7):
                 return user_input
             else:
                 print("Ошибка: неправильный формат HEX. Пример: #ff0000 или #f00")
         else:
-            # Проверяем через webcolors
             try:
                 webcolors.name_to_hex(user_input)
                 return user_input
@@ -40,8 +39,9 @@ def get_valid_color_from_user() -> str:
                 print("Ошибка: неизвестное название цвета. Попробуйте снова.")
 
 
+# === Меню выбора цветов ===
 def get_color_choice():
-    """Позволяет выбрать 2 цвета — из меню или ввести свой"""
+    """Позволяет выбрать два цвета — из меню или ввести свои"""
     print('Доступные цвета:\n')
 
     available_colors_1 = [
@@ -90,6 +90,8 @@ def get_color_choice():
 
     return first_color, second_color
 
+
+# === Предпросмотр выбранных цветов ===
 def preview_colors(color1: str, color2: str):
     """Показывает предпросмотр выбранных цветов"""
     turtle.clearscreen()
@@ -104,21 +106,19 @@ def preview_colors(color1: str, color2: str):
         turtle.fillcolor(color)
         turtle.begin_fill()
         for _ in range(4):
-            turtle.forward(100)
+            turtle.forward(120)
             turtle.right(90)
         turtle.end_fill()
-
-        # Подпись под квадратом
         turtle.penup()
-        turtle.goto(x + 50, y - 30)
+        turtle.goto(x + 60, y - 30)
         turtle.color("black")
         turtle.write(label, align="center", font=("Arial", 14, "normal"))
 
-    draw_square(-150, 50, color1, f"Цвет 1: {color1}")
-    draw_square(50, 50, color2, f"Цвет 2: {color2}")
+    draw_square(-160, 50, color1, f"Цвет 1: {color1}")
+    draw_square(80, 50, color2, f"Цвет 2: {color2}")
 
     turtle.penup()
-    turtle.goto(0, -100)
+    turtle.goto(0, -120)
     turtle.color("black")
     turtle.write("Нажмите Enter в консоли, чтобы начать рисование",
                  align="center", font=("Arial", 14, "italic"))
@@ -126,39 +126,48 @@ def preview_colors(color1: str, color2: str):
     input("\nНажмите Enter, чтобы начать рисование...")
 
 
+# === Рисование гексагона с тенями и границами ===
 def draw_hexagon(x: float, y: float, side_len: float, color: str):
-    """Отрисовка одного шестиугольника с заливкой"""
+    """Рисует гексагон с тенями"""
+    # Тень
     turtle.penup()
-    turtle.goto(x, y)
+    turtle.goto(x + 3, y - 3)
     turtle.pendown()
-
-    turtle.fillcolor(color)
+    turtle.fillcolor("#a0a0a0")
     turtle.begin_fill()
-
     turtle.setheading(30)
     for _ in range(6):
         turtle.forward(side_len)
         turtle.right(60)
+    turtle.end_fill()
 
+    # Основная фигура
+    turtle.penup()
+    turtle.goto(x, y)
+    turtle.pendown()
+    turtle.fillcolor(color)
+    turtle.begin_fill()
+    turtle.setheading(30)
+    for _ in range(6):
+        turtle.forward(side_len)
+        turtle.right(60)
     turtle.end_fill()
     turtle.setheading(0)
 
 
 def draw_hexagon_border(x: float, y: float, side_len: float):
-    """Отрисовка границы шестиугольника"""
+    """Граница вокруг гексагона"""
     turtle.penup()
     turtle.goto(x, y)
     turtle.pendown()
     turtle.pencolor("black")
     turtle.pensize(2)
-
     turtle.setheading(30)
     for _ in range(6):
         turtle.forward(side_len)
         turtle.right(60)
-
-    turtle.setheading(0)
     turtle.pensize(1)
+    turtle.setheading(0)
 
 
 def animate_drawing(centers: list, colors: list, side: float):
@@ -168,22 +177,21 @@ def animate_drawing(centers: list, colors: list, side: float):
         draw_hexagon(x, y, side, color)
         draw_hexagon_border(x, y, side)
         turtle.update()
-        time.sleep(0.05)
+        time.sleep(0.04)
     turtle.tracer(1, 10)
 
 
+# === Главная функция ===
 def main():
-    #сначала ввод
+    turtle.setup(900, 900)
+    turtle.speed(0)
+    turtle.hideturtle()
+    turtle.bgcolor("#f8f8ff")
+
     N = get_num_hexagons()
     color_first, color_second = get_color_choice()
 
-    #предпросмотр цветов
     preview_colors(color_first, color_second)
-
-    turtle.setup(800, 800)
-    turtle.speed(0)
-    turtle.hideturtle()
-    turtle.bgcolor("white")
 
     size = 500
     side_length = size / (N * 1.5)
@@ -193,7 +201,6 @@ def main():
     start_y_0 = side_length * (N / 2)
 
     centers, colors = [], []
-
     for row in range(N):
         y_offset = start_y_0 - row * side_length * 1.5
         x_offset = start_x_0 + (diagonal / 2 if row % 2 else 0)
@@ -208,7 +215,6 @@ def main():
     turtle.penup()
     turtle.goto(0, -size / 2 - 30)
     turtle.color("black")
-
     turtle.done()
 
 

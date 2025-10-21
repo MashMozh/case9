@@ -1,5 +1,7 @@
 import webcolors
 
+print('=== Гексагональный арт-генератор ===\n')
+
 def get_color_choice() -> str:
 
 
@@ -24,7 +26,6 @@ def get_color_choice() -> str:
                 print("Попробуйте еще раз.\n")
 
 
-    print('=== Гексагональный арт-генератор ===\n')
     print('Доступные цвета:\n')
 
     # Цвета первой и второй колонок с эмодзи через Unicode

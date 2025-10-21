@@ -21,3 +21,11 @@ color_second = get_color_choice(color_second)
 
 
 
+
+color_second = input('Выберите второй цвет из предложенных выше: ')
+color_second = get_color_choice(color_second)
+
+
+
+
+
